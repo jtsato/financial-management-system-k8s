@@ -1,0 +1,28 @@
+# Default values for transactions-api-chart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+environment: "development"
+
+application:
+  hostname: financial.management.test
+
+replicaCount: 1
+
+image:
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "v1.0.0-250120203"
+  pullPolicy: IfNotPresent
+
+nodeSelector:
+  app: localhost
+
+env:
+  configmaps:
+    ASPNETCORE_environment: "development"
+    TRANSACTION_COLLECTION_NAME: "transactions"
+    TRANSACTION_SEQUENCE_COLLECTION_NAME: "transactions_sequences"
+
+  secrets:
+    MONGODB_URL: bW9uZ29kYitzcnY6Ly9jb250YWluZXI6Y29udGFpbmVyQGxvY2FsaG9zdDoyNzAxOS90cmFuc2FjdGlvbnMtbW9uZ29kYg==
+    MONGODB_DATABASE: dHJhbnNhY3Rpb25zLW1vbmdvZGI=

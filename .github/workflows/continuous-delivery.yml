@@ -1,0 +1,93 @@
+name: Continuous Delivery
+
+on:
+  push:
+    branches: [main]
+
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  handle-change-requests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4.2.0
+        with:
+          version: '3.15.3'
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+      
+      - name: Check versions
+        run: | 
+          helm version
+          kubectl version --client
+
+      - name: Get the components versions
+        id: versions
+        run: |
+          echo "TXN_PRD=$(cat README.md | grep -o -P '(?<=<!-- txn-prd-start -->).*(?=<!-- txn-prd-end -->)')" >> $GITHUB_ENV
+
+      - name: Create destination folders
+        run: |
+          mkdir -p production/transactions-api
+
+      - name: Run Helm and check for changes [Transactions API]
+        working-directory: helm-chart/transactions-api
+        run: |
+          echo "Updating Production Environment to ${{ env.TXN_PRD }}"
+          sed -i 's/tag: ".*"/tag: "${{ env.TXN_PRD }}"/g' production-values.yaml
+          helm template . --values production-values.yaml --output-dir output
+          cp output/transactions-api-chart/templates/*.yaml ../../production/transactions-api
+          rm -rf output
+
+      - name: Run Conftest
+        uses: instrumenta/conftest-action@master
+        continue-on-error: false
+        with:
+          files: >-
+            production/transactions-api/configmap.yaml
+            production/transactions-api/deployment.yaml
+            production/transactions-api/hpa.yaml
+            production/transactions-api/secret.yaml
+            production/transactions-api/service.yaml
+    
+      - name: Check for changes
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "SHOULD_I_COMMIT=Yes" >> $GITHUB_ENV
+          else
+            echo "SHOULD_I_COMMIT=No" >> $GITHUB_ENV
+          fi
+
+      - name: Build Commit Message
+        if: ${{ env.SHOULD_I_COMMIT == 'Yes' }}      
+        run: |
+          if [[ "${{ github.event.head_commit.message }}" == *"ci("* ]]; then
+            echo "COMMIT_MESSAGE=cd$(echo '${{ github.event.head_commit.message }}' | grep -o -P '(?<=ci).*')" >> $GITHUB_ENV
+          else
+            echo "COMMIT_MESSAGE=${{ github.event.head_commit.message }}" >> $GITHUB_ENV
+          fi
+
+      - name: Commit the changes
+        if: ${{ env.SHOULD_I_COMMIT == 'Yes' }}
+        run: |
+          git config pull.rebase false        
+          git config --local user.email "action@github.com"
+          git config --local user.name "Continuous Delivery"
+          git add --all
+          git commit -m "${{ env.COMMIT_MESSAGE }}"
+          git pull origin ${GITHUB_REF##*/}
+
+      - name: Push the changes
+        if: ${{ env.SHOULD_I_COMMIT == 'Yes' }}
+        uses: ad-m/github-push-action@master
+        with:
+          branch: main

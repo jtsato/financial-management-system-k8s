@@ -1,0 +1,102 @@
+---
+# Source: transactions-api-chart/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: txn-api-deployment
+  namespace: development
+  labels:
+    app: txn-api
+    environment: development
+    app.kubernetes.io/name: txn-api
+    app.kubernetes.io/instance: txn-api-instance
+    app.kubernetes.io/version: v1.0.0-250120203
+    app.kubernetes.io/component: microservice
+    app.kubernetes.io/part-of: financial-management-system
+    app.kubernetes.io/managed-by: financial-management-system
+spec:
+  selector:
+    matchLabels:
+      app: txn-api
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: txn-api
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: txn-api-container
+          image: docker.io/jtsato/transactions-api:v1.0.0-250120203
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          resources:
+            requests:
+              cpu: 150m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 128Mi
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 2000
+            allowPrivilegeEscalation: false
+            privileged: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+              - all
+          env:            
+            - name: ASPNETCORE_environment
+              valueFrom:
+                configMapKeyRef:
+                  name: txn-api-configmap
+                  key: ASPNETCORE_environment
+            - name: TRANSACTION_COLLECTION_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: txn-api-configmap
+                  key: TRANSACTION_COLLECTION_NAME
+            - name: TRANSACTION_SEQUENCE_COLLECTION_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: txn-api-configmap
+                  key: TRANSACTION_SEQUENCE_COLLECTION_NAME            
+            - name: MONGODB_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: txn-api-secret
+                  key: MONGODB_DATABASE
+            - name: MONGODB_URL
+              valueFrom:
+                secretKeyRef:
+                  name: txn-api-secret
+                  key: MONGODB_URL
+          livenessProbe:
+            httpGet:
+              path: /health-check/live
+              port: 8000
+            failureThreshold: 5
+            initialDelaySeconds: 30
+            periodSeconds: 15
+            successThreshold: 1
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /health-check/ready
+              port: 8000
+            failureThreshold: 5
+            initialDelaySeconds: 30
+            periodSeconds: 15
+            successThreshold: 1
+            timeoutSeconds: 5
+          startupProbe:
+            httpGet:
+              path: /health-check/live
+              port: 8000
+            failureThreshold: 3
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1

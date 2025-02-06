@@ -1,0 +1,14 @@
+application:
+  name:
+    prefix: txn-api
+  # Inside the cluster, what port does the service expose?
+  port: 8081
+  # Which port do pods expose?
+  # This is usually the port on which the application runs.
+  targetPort: 8000
+
+image:
+  repository: docker.io/jtsato/transactions-api
+
+autoscaling:
+  enabled: true

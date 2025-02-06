@@ -1,0 +1,15 @@
+---
+# Source: transactions-api-chart/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: development
+  name: txn-api-service
+spec:
+  selector:
+    app: txn-api
+  ports:
+    - protocol: TCP
+      port: 8081
+      targetPort: 8000
+  type: NodePort

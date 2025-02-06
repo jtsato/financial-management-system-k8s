@@ -1,0 +1,11 @@
+---
+# Source: transactions-api-chart/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: txn-api-configmap
+  namespace: development
+data:
+  ASPNETCORE_environment: "development"
+  TRANSACTION_COLLECTION_NAME: "transactions"
+  TRANSACTION_SEQUENCE_COLLECTION_NAME: "transactions_sequences"
