@@ -34,10 +34,12 @@ jobs:
         id: versions
         run: |
           echo "TXN_PRD=$(cat README.md | grep -o -P '(?<=<!-- txn-prd-start -->).*(?=<!-- txn-prd-end -->)')" >> $GITHUB_ENV
+          echo "BAL_PRD=$(cat README.md | grep -o -P '(?<=<!-- bal-prd-start -->).*(?=<!-- bal-prd-end -->)')" >> $GITHUB_ENV
 
       - name: Create destination folders
         run: |
           mkdir -p production/transactions-api
+          mkdir -p production/balances-api
 
       - name: Run Helm and check for changes [Transactions API]
         working-directory: helm-chart/transactions-api
@@ -46,6 +48,15 @@ jobs:
           sed -i 's/tag: ".*"/tag: "${{ env.TXN_PRD }}"/g' production-values.yaml
           helm template . --values production-values.yaml --output-dir output
           cp output/transactions-api-chart/templates/*.yaml ../../production/transactions-api
+          rm -rf output
+      
+      - name: Run Helm and check for changes [Balances API]
+        working-directory: helm-chart/balances-api
+        run: |
+          echo "Updating Production Environment to ${{ env.BAL_PRD }}"
+          sed -i 's/tag: ".*"/tag: "${{ env.BAL_PRD }}"/g' production-values.yaml
+          helm template . --values production-values.yaml --output-dir output
+          cp output/balances-api-chart/templates/*.yaml ../../production/balances-api
           rm -rf output
 
       - name: Run Conftest
@@ -58,6 +69,11 @@ jobs:
             production/transactions-api/hpa.yaml
             production/transactions-api/secret.yaml
             production/transactions-api/service.yaml
+            production/balances-api/configmap.yaml
+            production/balances-api/deployment.yaml
+            production/balances-api/hpa.yaml
+            production/balances-api/secret.yaml
+            production/balances-api/service.yaml
     
       - name: Check for changes
         run: |

@@ -1,0 +1,15 @@
+---
+# Source: balances-api-chart/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: development
+  name: bal-api-service
+spec:
+  selector:
+    app: bal-api
+  ports:
+    - protocol: TCP
+      port: 8081
+      targetPort: 8000
+  type: NodePort

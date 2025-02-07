@@ -1,0 +1,28 @@
+# Default values for balances-api-chart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+environment: "development"
+
+application:
+  hostname: financial.management.test
+
+replicaCount: 1
+
+image:
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "v1.0.0-2502065"
+  pullPolicy: IfNotPresent
+
+nodeSelector:
+  app: localhost
+
+env:
+  configmaps:
+    ASPNETCORE_environment: "development"
+    BALANCE_COLLECTION_NAME: "balances"
+    BALANCE_SEQUENCE_COLLECTION_NAME: "balances_sequences"
+
+  secrets:
+    MONGODB_URL: bW9uZ29kYitzcnY6Ly9jb250YWluZXI6Y29udGFpbmVyQGxvY2FsaG9zdDoyNzAxOS9iYWxhbmNlcy1tb25nb2Ri
+    MONGODB_DATABASE: YmFsYW5jZXMtbW9uZ29kYg==

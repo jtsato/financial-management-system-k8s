@@ -16,3 +16,10 @@ spec:
             name: txn-api-service
             port:
               number: 8081
+      - path: /api/balances
+        pathType: Prefix
+        backend:
+          service:
+            name: txn-api-service
+            port:
+              number: 8081
