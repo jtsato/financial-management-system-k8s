@@ -11,7 +11,7 @@ replicaCount: 1
 
 image:
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "v1.0.0-2502077"
+  tag: "v1.0.0-2502078"
   pullPolicy: IfNotPresent
 
 nodeSelector:
