@@ -10,7 +10,7 @@ metadata:
     environment: development
     app.kubernetes.io/name: bal-api
     app.kubernetes.io/instance: bal-api-instance
-    app.kubernetes.io/version: v1.0.0-2502078
+    app.kubernetes.io/version: v1.0.0-2502089
     app.kubernetes.io/component: microservice
     app.kubernetes.io/part-of: financial-management-system
     app.kubernetes.io/managed-by: financial-management-system
@@ -27,7 +27,7 @@ spec:
       automountServiceAccountToken: false
       containers:
         - name: bal-api-container
-          image: docker.io/jtsato/balances-api:v1.0.0-2502078
+          image: docker.io/jtsato/balances-api:v1.0.0-2502089
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
