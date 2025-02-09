@@ -10,7 +10,7 @@ metadata:
     environment: development
     app.kubernetes.io/name: txn-api
     app.kubernetes.io/instance: txn-api-instance
-    app.kubernetes.io/version: v1.0.0-25020815
+    app.kubernetes.io/version: v1.0.0-25020916
     app.kubernetes.io/component: microservice
     app.kubernetes.io/part-of: financial-management-system
     app.kubernetes.io/managed-by: financial-management-system
@@ -27,7 +27,7 @@ spec:
       automountServiceAccountToken: false
       containers:
         - name: txn-api-container
-          image: docker.io/jtsato/transactions-api:v1.0.0-25020815
+          image: docker.io/jtsato/transactions-api:v1.0.0-25020916
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
