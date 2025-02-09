@@ -4,7 +4,7 @@ Financial System IaC Project ( The source of truth for Kubernetes Cluster )
 ## Applications Versions
 
 * Transactions API: <!-- txn-prd-start -->v1.0.0-25020712<!-- txn-prd-end -->
-* Balances API: <!-- bal-prd-start -->v1.0.0-2502078<!-- bal-prd-end -->
+* Balances API: <!-- bal-prd-start -->v1.0.0-2502089<!-- bal-prd-end -->
 
 ## Technology stack
 
